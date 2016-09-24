@@ -19,7 +19,11 @@ def find_closest(location, centroids):
     [2.0, 3.0]
     """
     # BEGIN Question 3
-    "*** REPLACE THIS LINE ***"
+    closest = centroids[0]
+    for c in centroids:
+        if distance(location, c) < distance (location, closest):
+            closest = c
+    return closest
     # END Question 3
 
 
@@ -48,14 +52,23 @@ def group_by_centroid(restaurants, centroids):
     restaurants closest to the same centroid.
     """
     # BEGIN Question 4
-    "*** REPLACE THIS LINE ***"
+    pairs = []
+    for r in restaurants:
+        c = find_closest(restaurant_location(r), centroids)
+        pairs.append([c, r])
+    return group_by_first(pairs)
     # END Question 4
 
 
 def find_centroid(cluster):
     """Return the centroid of the locations of the restaurants in cluster."""
     # BEGIN Question 5
-    "*** REPLACE THIS LINE ***"
+    x, y = [], []
+    for r in cluster:
+        c = restaurant_location(r)
+        x.append(c[0])
+        y.append(c[1])
+    return [mean(x),mean(y)]
     # END Question 5
 
 
@@ -69,7 +82,8 @@ def k_means(restaurants, k, max_updates=100):
     while old_centroids != centroids and n < max_updates:
         old_centroids = centroids
         # BEGIN Question 6
-        "*** REPLACE THIS LINE ***"
+        groups = group_by_centroid(restaurants, centroids)
+        centroids = [find_centroid(g) for g in groups]
         # END Question 6
         n += 1
     return centroids
