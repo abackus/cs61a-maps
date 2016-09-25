@@ -93,7 +93,6 @@ def k_means(restaurants, k, max_updates=100):
 # Phase 3: Supervised Learning #
 ################################
 
-
 def find_predictor(user, restaurants, feature_fn):
     """Return a rating predictor (a function from restaurants to ratings),
     for a user by performing least-squares linear regression using feature_fn
@@ -111,15 +110,22 @@ def find_predictor(user, restaurants, feature_fn):
     ys = [reviews_by_user[restaurant_name(r)] for r in restaurants]
 
     # BEGIN Question 7
-    "*** REPLACE THIS LINE ***"
-    b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
+    sxx, syy, sxy = 0, 0, 0
+    avg_x, avg_y = mean(xs), mean(ys)
+    for i in range(len(xs)):
+        x, y = xs[i], ys[i]
+        sxx += (x - avg_x) ** 2
+        syy += (y - avg_y) ** 2
+        sxy += (x - avg_x) * (y - avg_y)
+    b = sxy/sxx
+    a = avg_y - avg_x * b
+    r_squared = (sxy**2)/(sxx*syy)
     # END Question 7
 
     def predictor(restaurant):
         return b * feature_fn(restaurant) + a
 
     return predictor, r_squared
-
 
 def best_predictor(user, restaurants, feature_fns):
     """Find the feature within feature_fns that gives the highest R^2 value
@@ -132,9 +138,9 @@ def best_predictor(user, restaurants, feature_fns):
     """
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 8
-    "*** REPLACE THIS LINE ***"
+    predictors = [find_predictor(user, restaurants, f) for f in feature_fns]
+    return max(predictors, key=lambda x: x[1])[0] 
     # END Question 8
-
 
 def rate_all(user, restaurants, feature_fns):
     """Return the predicted ratings of restaurants by user using the best
@@ -148,7 +154,13 @@ def rate_all(user, restaurants, feature_fns):
     predictor = best_predictor(user, ALL_RESTAURANTS, feature_fns)
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 9
-    "*** REPLACE THIS LINE ***"
+    s = {}
+    for r in restaurants:
+        if r in reviewed:
+            s.update({r: user_rating(user, r)})
+        else:
+            s.update({r: predictor(r)})
+    return s
     # END Question 9
 
 
@@ -160,7 +172,7 @@ def search(query, restaurants):
     restaurants -- A sequence of restaurants
     """
     # BEGIN Question 10
-    "*** REPLACE THIS LINE ***"
+    return [r for r in restaurants if query in restaurant_categories(r)]
     # END Question 10
 
 
